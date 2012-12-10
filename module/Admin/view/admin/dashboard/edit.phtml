@@ -1,0 +1,32 @@
+<div style="border:10px solid #cccccc;width:100%;display: block;">
+            <div style="float:left;width:35%;border:1px solid #aabbff;">
+                <?php 
+                //$form = $this->form;
+$form->setAttribute('action', $this->url(
+    'Dashboard',
+    array(
+        'action' => 'edit',
+        'id'     => $this->id,
+    )
+));
+$form->prepare();
+echo $this->form()->openTag($form);
+echo 'Title: '.$this->formRow($form->get('title'));
+echo '<br>Name: '.$this->formRow($form->get('name'));
+echo '<br>HTML: <br>'.$this->formRow($form->get('html'));
+echo '<br>';
+
+echo $this->formSubmit($form->get('submit'));
+echo $this->form()->closeTag();
+                ?>
+            </div> 
+            <div style="float:left;width:50%;border:71px dotted #fffccc;">
+                <h2>Live Preview</h2>
+                <div>
+                    <?php echo $data->html; ?>
+                </div>
+            </div>
+            <div style="clear:both"></div>
+        </div>
+
+

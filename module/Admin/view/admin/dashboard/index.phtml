@@ -1,0 +1,45 @@
+Welcome <?php
+echo $user;
+?>
+<span style="float:right"><a href="<?php echo $this->url('Admin/', array('action'=>'logout')); ?>">Logout</a></span>
+<div id="menu">
+    <ul style="list-style: none;border:1px dotted #cccccc;">
+        <?php foreach($pages as $page) : ?>
+            <li style="display: inline;margin-left:10px;cursor: pointer;background-color: #cccfff;">
+              <a href="Dashboard/edit/<?php echo $page->id?>">  <?php echo $page->title; ?> </a>
+            </li>
+            <?php endforeach; ?>
+    </ul>
+</div>
+<div style="width: 100%">
+      <?php
+$form = $this->form;
+$form->setAttribute('action', $this->url('Dashboard', array('action' => 'index')));
+$form->prepare();
+
+echo $this->form()->openTag($form); 
+?>
+        <table align="center">
+            <thead>
+            <th colspan="2" style="text-align:center;color:blue;">Create New Page</th>
+            </thead>
+            <tbody>
+               
+                <tr>
+                    <td>Page Title : </td><td><?php echo $this->formRow($form->get('title')); ?></td>
+                </tr>
+                <tr>
+                    <td>Page Name : </td><td><?php echo $this->formRow($form->get('name')); ?></td>
+                </tr>
+                <tr>
+                    <td> TEXT : </td><td><?php echo $this->formRow($form->get('html')); ?></td>
+                </tr>
+            </tbody>
+        </table>
+<?php 
+
+echo $this->formSubmit($form->get('submit'));
+echo $this->form()->closeTag(); 
+
+?>
+</div>
