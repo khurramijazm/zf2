@@ -33,11 +33,23 @@ class Module
 
    public function getControllerConfig()
     {
+       /**
+        * For this to work here you have to remove  Dashboard from the module.config.php file 
+        * from the invokeables array. It will work only then.  
+        */
        return array(
          'factories'  => array(
            'Admin\Controller\Dashboard'  => function(ControllerManager $cm){
                 $sm = $cm->getServiceLocator();
                 $auth = $sm->get('Admin\Authentication\Service');
+                /**
+                 * Check if the user is loggged in ? only then return 
+                 * the instance of DashboardController other wise 
+                 * return the instance of RedirectController which i will in its indexAction 
+                 * will redirect to the Login Page . 
+                 * 
+                 * We have to return a valid controller here.  
+                 */
                 if($auth->hasIdentity()){                    
                     $controller = new Controller\DashboardController;                
                     return $controller;
@@ -56,6 +68,17 @@ class Module
     
     public function preDispatch(\Zend\Mvc\MvcEvent $e)
     {
+        /**
+         * In our case preDispatch will be called on the LoginpageController because 
+         * we have returned the instance of LoginpageController in the getControllerConfig() so 
+         * it will stop the Routing to 
+         * localhost/Dashboard
+         * localhost/Dashboard/edit
+         * localhost/Dashboard/edit/11
+         * 
+         * With this approach the preDispatch was only taking care of the localhost/Dashboard Route , and 
+         * was displaying localhost/Dashboard/edit/11 . 
+         */
         $application    = $e->getApplication();
         $serviceManager = $application->getServiceManager();
         $controller = $e->getTarget();
@@ -104,6 +127,14 @@ class Module
                     return $pagesTable;
                 },
                 'Admin\Authentication\Service' => function($sm){
+                    /**
+                     * I have not found a way to instantiate AuthenticationService instance once only and resuse it again.
+                     * The questions are not answered on the Mailing list not even on stackoverflow
+                     * so it returns a new instance of AuthenticationService() every time 
+                     * but The new instance will always use the same Session/Storage. huh it works but needs to dig 
+                     * more ...
+                     *  
+                     */
                     return new \Zend\Authentication\AuthenticationService();
                 },
             ),
