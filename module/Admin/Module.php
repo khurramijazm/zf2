@@ -36,8 +36,9 @@ class Module
         return array(
          'factories'  => array(
            'Dashboard'  => function(ControllerManager $cm){
+               var_dump($cm);
                 $controller = new Admin\Controller\DashboardController();                
-                return null;
+                return $controller;
             
            }
          ),
