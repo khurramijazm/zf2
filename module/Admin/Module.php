@@ -15,6 +15,7 @@ use Zend\Authentication\Adapter\DbTable as AuthAdapter;
 use Zend\Db\TableGateway\TableGateway;
 use Admin\Model\PagesTable;
 use Zend\Authentication\AuthenticationService;
+use Zend\Mvc\Controller\ControllerManager;
 
 class Module
 {
@@ -22,8 +23,8 @@ class Module
     {
         $e->getApplication()->getServiceManager()->get('translator');
         $eventManager        = $e->getApplication()->getEventManager();
-//        $eventManager->getSharedManager()
-//            ->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH, array($this, 'preDispatch'), 1);
+        $eventManager->getSharedManager()
+            ->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH, array($this, 'preDispatch'), 1);
        
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
@@ -32,38 +33,45 @@ class Module
 
    public function getControllerConfig()
     {
-       echo 'inside getControllerConfig()';
-        return array(
+       return array(
          'factories'  => array(
-           'Dashboard'  => function(ControllerManager $cm){
-               var_dump($cm);
-                $controller = new Admin\Controller\DashboardController();                
-                return $controller;
-            
+           'Admin\Controller\Dashboard'  => function(ControllerManager $cm){
+                $sm = $cm->getServiceLocator();
+                $auth = $sm->get('Admin\Authentication\Service');
+                if($auth->hasIdentity()){                    
+                    $controller = new Controller\DashboardController;                
+                    return $controller;
+                }
+                else
+                {
+                    $controller = new Controller\LoginPageController;
+                    return $controller;
+                }
            }
          ),
        );
+       
+       
     }
     
-//    public function preDispatch(\Zend\Mvc\MvcEvent $e)
-//    {
-//                 
-//        $application    = $e->getApplication();
-//        $serviceManager = $application->getServiceManager();
-//        $controller = $e->getTarget();
-//        $route = $controller->getEvent()->getRouteMatch();
-//        $hit_controller = $route->getParam('__CONTROLLER__');
-//        if(strcmp($hit_controller,"Dashboard")==0){
-//            $authService = $serviceManager->get('Admin\Authentication\Service');
-//            if (!$authService->hasIdentity()) {
-//                $pluginManager  = $serviceManager->get('Zend\Mvc\Controller\PluginManager');
-//                $urlPlugin      = $pluginManager->get('url');
-//                $redirectPlugin = $pluginManager->get('redirect');
-//                return $redirectPlugin->toRoute('Admin',array('controller'=>'Admin','action'=>'index'));
-//            }
-//        }
-//        return;
-//    }    
+    public function preDispatch(\Zend\Mvc\MvcEvent $e)
+    {
+        $application    = $e->getApplication();
+        $serviceManager = $application->getServiceManager();
+        $controller = $e->getTarget();
+        $route = $controller->getEvent()->getRouteMatch();
+        $hit_controller = $route->getParam('__CONTROLLER__');
+        if(strcmp($hit_controller,"Dashboard")==0){
+            $authService = $serviceManager->get('Admin\Authentication\Service');
+            if (!$authService->hasIdentity()) {
+                $pluginManager  = $serviceManager->get('Zend\Mvc\Controller\PluginManager');
+                $urlPlugin      = $pluginManager->get('url');
+                $redirectPlugin = $pluginManager->get('redirect');
+                return $redirectPlugin->toRoute('Admin',array('controller'=>'Admin','action'=>'index'));
+            }
+        }
+        return;
+    }    
     
     public function getConfig()
     {
@@ -90,14 +98,14 @@ class Module
                     return $dbAdapter;
                 },
                  'Admin\Model\PagesTable' => function($sm){
-                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                     $pagesTable = new PagesTable(new TableGateway('pages',$dbAdapter) );
+                     $dbAdapter    = $sm->get('Zend\Db\Adapter\Adapter');
+                     $tableGateway = new TableGateway('pages', $dbAdapter);
+                     $pagesTable   = new PagesTable($tableGateway);
                     return $pagesTable;
                 },
                 'Admin\Authentication\Service' => function($sm){
-                    return new AuthenticationService();
-                    
-                }
+                    return new \Zend\Authentication\AuthenticationService();
+                },
             ),
         );
     }
