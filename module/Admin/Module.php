@@ -33,23 +33,15 @@ class Module
    public function getControllerConfig()
     {
        echo 'inside getControllerConfig()';
-        return array('factories' => array(
-            'Admin\check_login' => function ($controllers) {
-                $services   = $controllers->getServiceLocator();
-                $controller = new Controller\MyController();
-                $events     = $services->get('EventManager');
-                $events->attach('dispatch', function ($e) use ($controller) {
-                    $request = $e->getRequest();
-                    $method  = $request->getMethod();
-                    var_dump($request);
-                    var_dump($method);
-                    //return $controller->redirect()->toRoute(/* ... */);
-                }, 100); // execute before executing action logic
-
-                $controller->setEventManager($events);
-                return $controller;
-            }
-        ));
+        return array(
+         'factories'  => array(
+           'Dashboard'  => function(ControllerManager $cm){
+                $controller = new Admin\Controller\DashboardController();                
+                return null;
+            
+           }
+         ),
+       );
     }
     
 //    public function preDispatch(\Zend\Mvc\MvcEvent $e)
