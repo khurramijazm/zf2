@@ -2,10 +2,8 @@
 
 /*
  * Created on Dec 4, 2012
- * Author: Mian Khurram Ijaz (khurramijazm@gmail.com)
- * Copyright 2012 NextBridge Vteams USA. All rights reserved.
- * COMPANY PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
+ * Author: Mian Khurram Ijaz 
+  */
 
 namespace Admin;
 
@@ -45,8 +43,8 @@ class Module
                 /**
                  * Check if the user is loggged in ? only then return 
                  * the instance of DashboardController other wise 
-                 * return the instance of RedirectController which i will in its indexAction 
-                 * will redirect to the Login Page . 
+                 * return the instance of RedirectController which in our case is LoginpageController
+                 * and in its  indexAction we will redirect to the Login Page . 
                  * 
                  * We have to return a valid controller here.  
                  */
@@ -76,8 +74,10 @@ class Module
          * localhost/Dashboard/edit
          * localhost/Dashboard/edit/11
          * 
-         * With this approach the preDispatch was only taking care of the localhost/Dashboard Route , and 
+         * Without this approach the preDispatch was only taking care of the 
+         * localhost/Dashboard Route , and 
          * was displaying localhost/Dashboard/edit/11 . 
+         * 
          */
         $application    = $e->getApplication();
         $serviceManager = $application->getServiceManager();
